@@ -1,0 +1,32 @@
+name: Auto Update VN IP List from APNIC
+
+on:
+  schedule:
+    # Tự động chạy vào lúc 00:00 Chủ nhật hàng tuần
+    - cron: '0 0 * * 0'
+  workflow_dispatch: # Cho phép bác bấm nút chạy thủ công bất cứ lúc nào
+
+jobs:
+  update-ip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Parse APNIC Data & Generate RSC
+        run: |
+          echo ":log info \"Danh sach IP VietNam tu APNIC\"" > IPVN.rsc
+          echo "/ip firewall address-list remove [find list=\"IPVietNam\"]" >> IPVN.rsc
+          # Kéo data APNIC, lọc IP VN, tính log(2) để ra Prefix /24, /22...
+          curl -s http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | awk -F '|' '/apnic\|VN\|ipv4/ {
+              mask = 32 - log($5)/log(2);
+              printf "/ip firewall address-list add list=\"IPVietNam\" address=%s/%d\n", $4, mask;
+          }' >> IPVN.rsc
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add IPVN.rsc
+          git commit -m "Auto-update IP VietNam from APNIC" || exit 0
+          git push
