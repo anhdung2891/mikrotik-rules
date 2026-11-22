@@ -1158,6 +1158,7 @@
 /ip firewall address-list add list="IPVietNam" address=138.252.206.0/23
 /ip firewall address-list add list="IPVietNam" address=138.252.218.0/23
 /ip firewall address-list add list="IPVietNam" address=138.252.244.0/23
+/ip firewall address-list add list="IPVietNam" address=141.229.46.0/23
 /ip firewall address-list add list="IPVietNam" address=144.48.20.0/22
 /ip firewall address-list add list="IPVietNam" address=144.48.24.0/22
 /ip firewall address-list add list="IPVietNam" address=144.79.12.0/23
